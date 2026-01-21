@@ -22,30 +22,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const efectivo = parseEuro(ventaEfectivo.value);
     const tarjeta = parseEuro(ventaTarjeta.value);
     const gasto = parseEuro(gastos.value);
-    const resultado = efectivo + tarjeta - gasto;
-    total.value = resultado.toFixed(2).replace(".", ",");
-
-    // Validar el formulario cada vez que cambia el total
-    validarFormulario();
+    total.value = (efectivo + tarjeta - gasto).toFixed(2).replace(".", ",");
   }
 
   function validarFormulario() {
-    // El botón se habilita solo si los campos obligatorios tienen valor
     const valido =
       fecha.value.trim() !== "" &&
       nombre.value.trim() !== "" &&
       puntoVenta.value.trim() !== "";
-
     btnGuardar.disabled = !valido;
   }
 
-  // Escuchar cambios en campos obligatorios
   [fecha, nombre, puntoVenta].forEach(c => {
     c.addEventListener("input", validarFormulario);
     c.addEventListener("change", validarFormulario);
   });
 
-  // Escuchar cambios en los inputs numéricos para recalcular total
   [ventaEfectivo, ventaTarjeta, gastos].forEach(c => {
     c.addEventListener("input", actualizarTotal);
   });
@@ -57,7 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify(data)
       });
       const result = await response.json();
-
       if (result.status === "success") {
         mensaje.innerHTML = "✅ Venta guardada";
         formulario.reset();
@@ -65,20 +56,14 @@ document.addEventListener("DOMContentLoaded", () => {
         btnGuardar.disabled = true;
       } else {
         mensaje.innerHTML = "❌ Error al guardar";
-        btnGuardar.disabled = false;
       }
     } catch (error) {
       mensaje.innerHTML = "❌ Error de conexión";
-      btnGuardar.disabled = false;
     }
   }
 
   formulario.addEventListener("submit", e => {
     e.preventDefault();
-
-    btnGuardar.disabled = true;
-    mensaje.innerHTML = "⏳ Guardando...";
-
     const data = {
       fecha: fecha.value,
       nombre: nombre.value,
@@ -89,12 +74,8 @@ document.addEventListener("DOMContentLoaded", () => {
       total: total.value,
       observaciones: observaciones.value
     };
-
     enviarDatos(data);
   });
 
-  // Inicializa validación y total
-  actualizarTotal();
   validarFormulario();
-
 });
